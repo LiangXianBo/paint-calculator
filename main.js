@@ -1,4 +1,4 @@
-// 涂料重量计算器主要逻辑
+// 涂料用量计算器主要逻辑
 class PaintCalculator {
     constructor() {
         this.chart = null;
@@ -128,7 +128,7 @@ class PaintCalculator {
             topcoatRatio2: parseFloat(document.getElementById('topcoatRatio2').value)
         };
 
-        // 计算涂料重量
+        // 计算涂料用量
         const calculations = this.performCalculations(inputs);
         
         // 显示结果
@@ -229,7 +229,7 @@ class PaintCalculator {
             },
             series: [
                 {
-                    name: '涂料重量分布',
+                    name: '涂料用量分布',
                     type: 'pie',
                     radius: ['40%', '70%'],
                     center: ['60%', '50%'],
