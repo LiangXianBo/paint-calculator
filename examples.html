@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>示例问题 - 涂料重量计算器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .step-card {
+            border-left: 4px solid #E67E22;
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .formula-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+        }
+        .number-display {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-800" style="font-family: 'Noto Serif SC', serif;">涂料重量计算器</h1>
+                </div>
+                <div class="flex space-x-8">
+                    <a href="index.html" class="text-gray-600 hover:text-orange-500 transition-colors font-medium">计算器</a>
+                    <a href="#" class="text-orange-500 font-medium">示例问题</a>
+                    <a href="guide.html" class="text-gray-600 hover:text-orange-500 transition-colors font-medium">使用说明</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg py-16 text-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4" style="font-family: 'Noto Serif SC', serif;">
+                    示例问题详解
+                </h1>
+                <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                    基于实际工业场景的涂料重量计算案例分析，详细展示计算过程和结果
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example Problem -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Problem Statement -->
+            <div class="glass-card rounded-2xl p-8 shadow-xl mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm mr-3">题</span>
+                    问题描述
+                </h2>
+                
+                <div class="bg-blue-50 rounded-xl p-6">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-4">计算条件</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            <span class="text-gray-700">机型：<strong>R6-2000H</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            <span class="text-gray-700">面积：<strong>73,834 mm²</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            <span class="text-gray-700">底漆厚度：<strong>0.04 mm</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            <span class="text-gray-700">面漆厚度：<strong>0.14 mm</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            <span class="text-gray-700">涂料密度：<strong>1.22 kg/L</strong></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full mr-3"></span>
+                            <span class="text-gray-700">固化剂比例：<strong>1:10</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 space-y-3">
+                    <div class="text-lg font-medium text-gray-800">
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm mr-3">问题1</span>
+                        底漆和面漆对应的重量是多少公斤？(保留四位小数)
+                    </div>
+                    <div class="text-lg font-medium text-gray-800">
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm mr-3">问题2</span>
+                        底漆固化剂和面漆固化剂的重量分别是多少公斤？(保留四位小数)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solution Steps -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Step 1: Calculate Paint Weight -->
+                <div class="step-card glass-card rounded-2xl p-8 shadow-xl">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm mr-3">1</span>
+                        计算涂料重量
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="formula-box rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">计算公式</h4>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div>涂料重量 = 面积 × 厚度 × 密度</div>
+                                <div class="text-xs text-gray-500">（注意单位统一：面积mm²→m²，厚度mm→m）</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <h5 class="font-medium text-blue-800 mb-2">底漆重量计算</h5>
+                                <div class="text-sm space-y-1">
+                                    <div>面积：73,834 mm² = 0.073834 m²</div>
+                                    <div>厚度：0.04 mm = 0.00004 m</div>
+                                    <div>体积：0.073834 × 0.00004 = 0.000002953 m³</div>
+                                    <div>体积(升)：0.000002953 × 1000 = 0.002953 L</div>
+                                    <div>重量：0.002953 × 1.22 = <strong class="number-display text-blue-600">0.0036 kg</strong></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-green-50 rounded-lg p-4">
+                                <h5 class="font-medium text-green-800 mb-2">面漆重量计算</h5>
+                                <div class="text-sm space-y-1">
+                                    <div>面积：73,834 mm² = 0.073834 m²</div>
+                                    <div>厚度：0.14 mm = 0.00014 m</div>
+                                    <div>体积：0.073834 × 0.00014 = 0.000010337 m³</div>
+                                    <div>体积(升)：0.000010337 × 1000 = 0.010337 L</div>
+                                    <div>重量：0.010337 × 1.22 = <strong class="number-display text-green-600">0.0126 kg</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Calculate Curing Agent -->
+                <div class="step-card glass-card rounded-2xl p-8 shadow-xl">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm mr-3">2</span>
+                        计算固化剂重量
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div class="formula-box rounded-lg p-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">计算公式</h4>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div>固化剂重量 = 涂料重量 × (固化剂比例 / 总比例)</div>
+                                <div class="text-xs text-gray-500">比例1:10表示固化剂占总量的1/11</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="bg-purple-50 rounded-lg p-4">
+                                <h5 class="font-medium text-purple-800 mb-2">底漆固化剂计算</h5>
+                                <div class="text-sm space-y-1">
+                                    <div>涂料重量：0.0036 kg</div>
+                                    <div>比例：1:10，固化剂占比 = 1/(1+10) = 1/11</div>
+                                    <div>固化剂重量：0.0036 × (1/11) = <strong class="number-display text-purple-600">0.0003 kg</strong></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-red-50 rounded-lg p-4">
+                                <h5 class="font-medium text-red-800 mb-2">面漆固化剂计算</h5>
+                                <div class="text-sm space-y-1">
+                                    <div>涂料重量：0.0126 kg</div>
+                                    <div>比例：1:10，固化剂占比 = 1/(1+10) = 1/11</div>
+                                    <div>固化剂重量：0.0126 × (1/11) = <strong class="number-display text-red-600">0.0011 kg</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Results -->
+            <div class="mt-8">
+                <div class="glass-card rounded-2xl p-8 shadow-xl">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                        <span class="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm mr-3">答</span>
+                        最终答案
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="bg-blue-50 rounded-xl p-6 text-center">
+                            <h3 class="text-sm font-medium text-blue-800 mb-2">底漆重量</h3>
+                            <div class="number-display text-3xl font-bold text-blue-600">0.0036</div>
+                            <div class="text-sm text-blue-600">公斤</div>
+                        </div>
+                        
+                        <div class="bg-green-50 rounded-xl p-6 text-center">
+                            <h3 class="text-sm font-medium text-green-800 mb-2">面漆重量</h3>
+                            <div class="number-display text-3xl font-bold text-green-600">0.0126</div>
+                            <div class="text-sm text-green-600">公斤</div>
+                        </div>
+                        
+                        <div class="bg-purple-50 rounded-xl p-6 text-center">
+                            <h3 class="text-sm font-medium text-purple-800 mb-2">底漆固化剂</h3>
+                            <div class="number-display text-3xl font-bold text-purple-600">0.0003</div>
+                            <div class="text-sm text-purple-600">公斤</div>
+                        </div>
+                        
+                        <div class="bg-red-50 rounded-xl p-6 text-center">
+                            <h3 class="text-sm font-medium text-red-800 mb-2">面漆固化剂</h3>
+                            <div class="number-display text-3xl font-bold text-red-600">0.0011</div>
+                            <div class="text-sm text-red-600">公斤</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 bg-gray-100 rounded-xl p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">总结</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">0.0162 kg</div>
+                                <div class="text-sm text-gray-600">涂料总重量</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">0.0014 kg</div>
+                                <div class="text-sm text-gray-600">固化剂总重量</div>
+                            </div>
+                            <div>
+                                <div class="text-2xl font-bold text-gray-800">0.0176 kg</div>
+                                <div class="text-sm text-gray-600">总重量</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Try It Yourself -->
+            <div class="mt-8 text-center">
+                <div class="glass-card rounded-2xl p-8 shadow-xl">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">自己动手试试</h2>
+                    <p class="text-gray-600 mb-6">使用在线计算器验证以上结果，或计算您自己的涂料用量</p>
+                    <a href="index.html" class="inline-flex items-center px-8 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        开始计算
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="text-xl font-bold mb-4" style="font-family: 'Noto Serif SC', serif;">专业涂料重量计算器</h3>
+                <p class="text-gray-400 mb-4">为工业制造提供精确的涂料用量计算服务</p>
+                <div class="text-sm text-gray-500">
+                    © 2024 涂料重量计算器. 专业工业计算工具
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            // 步骤卡片动画
+            const stepCards = document.querySelectorAll('.step-card');
+            stepCards.forEach((card, index) => {
+                anime({
+                    targets: card,
+                    translateY: [50, 0],
+                    opacity: [0, 1],
+                    duration: 600,
+                    delay: index * 200,
+                    easing: 'easeOutQuad'
+                });
+            });
+
+            // 结果卡片动画
+            const resultCards = document.querySelectorAll('.bg-blue-50, .bg-green-50, .bg-purple-50, .bg-red-50');
+            resultCards.forEach((card, index) => {
+                anime({
+                    targets: card,
+                    scale: [0.8, 1],
+                    opacity: [0, 1],
+                    duration: 500,
+                    delay: 1000 + index * 100,
+                    easing: 'easeOutElastic(1, .8)'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

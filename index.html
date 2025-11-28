@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>涂料重量计算器 - 专业工业计算工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-group {
+            transition: all 0.3s ease;
+        }
+        .input-group:focus-within {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(44, 62, 80, 0.15);
+        }
+        .result-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-left: 4px solid #E67E22;
+        }
+        .calculate-btn {
+            background: linear-gradient(135deg, #E67E22 0%, #d35400 100%);
+            transition: all 0.3s ease;
+        }
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(230, 126, 34, 0.3);
+        }
+        .number-display {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        .history-item {
+            transition: all 0.3s ease;
+        }
+        .history-item:hover {
+            transform: translateX(4px);
+            background: rgba(230, 126, 34, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-bold text-gray-800" style="font-family: 'Noto Serif SC', serif;">涂料重量计算器</h1>
+                </div>
+                <div class="flex space-x-8">
+                    <a href="#" class="text-gray-600 hover:text-orange-500 transition-colors font-medium">计算器</a>
+                    <a href="examples.html" class="text-gray-600 hover:text-orange-500 transition-colors font-medium">示例问题</a>
+                    <a href="guide.html" class="text-gray-600 hover:text-orange-500 transition-colors font-medium">使用说明</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-bg py-16 text-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4" style="font-family: 'Noto Serif SC', serif;">
+                    专业涂料重量计算器
+                </h1>
+                <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                    为工业制造提供精确的涂料用量计算，支持底漆、面漆及固化剂的全方位重量分析
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Calculator -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Input Panel -->
+                <div class="lg:col-span-2">
+                    <div class="glass-card rounded-2xl p-8 shadow-xl">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <span class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm mr-3">1</span>
+                            参数输入
+                        </h2>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 基础参数 -->
+                            <div class="input-group bg-gray-50 rounded-xl p-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">机型/项目编号</label>
+                                <input type="text" id="projectId" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" placeholder="如：R6-2000H">
+                            </div>
+                            
+                            <div class="input-group bg-gray-50 rounded-xl p-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">面积 (mm²)</label>
+                                <input type="number" id="area" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" placeholder="73834" step="0.01">
+                            </div>
+                            
+                            <div class="input-group bg-gray-50 rounded-xl p-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">底漆厚度 (mm)</label>
+                                <input type="number" id="primerThickness" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" placeholder="0.04" step="0.001">
+                            </div>
+                            
+                            <div class="input-group bg-gray-50 rounded-xl p-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">面漆厚度 (mm)</label>
+                                <input type="number" id="topcoatThickness" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" placeholder="0.14" step="0.001">
+                            </div>
+                            
+                            <div class="input-group bg-gray-50 rounded-xl p-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">涂料密度 (kg/L)</label>
+                                <input type="number" id="density" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all" placeholder="1.22" step="0.01">
+                            </div>
+                        </div>
+
+                        <!-- 固化剂比例设置 -->
+                        <div class="mt-8">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">固化剂比例设置</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="input-group bg-blue-50 rounded-xl p-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">底漆固化剂比例</label>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="number" id="primerRatio" class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value="1" min="1">
+                                        <span class="text-gray-600">:</span>
+                                        <input type="number" id="primerRatio2" class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value="10" min="1">
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group bg-green-50 rounded-xl p-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">面漆固化剂比例</label>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="number" id="topcoatRatio" class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value="1" min="1">
+                                        <span class="text-gray-600">:</span>
+                                        <input type="number" id="topcoatRatio2" class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent" value="10" min="1">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 计算按钮 -->
+                        <div class="mt-8 text-center">
+                            <button id="calculateBtn" class="calculate-btn text-white px-12 py-4 rounded-xl font-semibold text-lg shadow-lg">
+                                <span class="flex items-center justify-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                    </svg>
+                                    开始计算
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- 快速示例按钮 -->
+                        <div class="mt-4 text-center">
+                            <button id="loadExampleBtn" class="text-orange-500 hover:text-orange-600 font-medium transition-colors">
+                                加载示例数据
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="lg:col-span-1">
+                    <div class="glass-card rounded-2xl p-8 shadow-xl sticky top-24">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                            <span class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm mr-3">2</span>
+                            计算结果
+                        </h2>
+                        
+                        <!-- 结果显示区域 -->
+                        <div id="resultsArea" class="space-y-4">
+                            <div class="result-card rounded-xl p-4">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">底漆重量</h3>
+                                <div class="number-display text-2xl font-bold text-blue-600" id="primerWeight">--</div>
+                                <div class="text-sm text-gray-500">公斤</div>
+                            </div>
+                            
+                            <div class="result-card rounded-xl p-4">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">面漆重量</h3>
+                                <div class="number-display text-2xl font-bold text-green-600" id="topcoatWeight">--</div>
+                                <div class="text-sm text-gray-500">公斤</div>
+                            </div>
+                            
+                            <div class="result-card rounded-xl p-4">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">底漆固化剂</h3>
+                                <div class="number-display text-2xl font-bold text-purple-600" id="primerCuringAgent">--</div>
+                                <div class="text-sm text-gray-500">公斤</div>
+                            </div>
+                            
+                            <div class="result-card rounded-xl p-4">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">面漆固化剂</h3>
+                                <div class="number-display text-2xl font-bold text-red-600" id="topcoatCuringAgent">--</div>
+                                <div class="text-sm text-gray-500">公斤</div>
+                            </div>
+                            
+                            <div class="bg-gray-100 rounded-xl p-4 mt-6">
+                                <h3 class="text-sm font-medium text-gray-600 mb-2">总重量</h3>
+                                <div class="number-display text-3xl font-bold text-gray-800" id="totalWeight">--</div>
+                                <div class="text-sm text-gray-500">公斤</div>
+                            </div>
+                        </div>
+
+                        <!-- 图表展示区域 -->
+                        <div class="mt-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">重量分布图</h3>
+                            <div id="weightChart" style="height: 200px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-2xl p-8 shadow-xl">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span class="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm mr-3">3</span>
+                    计算历史
+                </h2>
+                
+                <div id="historyList" class="space-y-3">
+                    <div class="text-center text-gray-500 py-8">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>暂无计算记录</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h3 class="text-xl font-bold mb-4" style="font-family: 'Noto Serif SC', serif;">专业涂料重量计算器</h3>
+                <p class="text-gray-400 mb-4">为工业制造提供精确的涂料用量计算服务</p>
+                <div class="text-sm text-gray-500">
+                    © 2024 涂料重量计算器. 专业工业计算工具
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
